@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlueCinema - Nonton Film</title>
+
+  <style>
+    :root {
+      --blue: #1769d2;
+      --blue-dark: #0b1d3a;
+      --white: #ffffff;
+      --text: #172b4d;
+      --muted: #718096;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8ff;
+      color: var(--text);
+    }
+
+    header {
+      background: var(--blue-dark);
+      color: white;
+      padding: 18px 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #63b3ff;
+    }
+
+    nav {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .hero {
+      background: linear-gradient(120deg, #0b1d3a, #1769d2);
+      color: white;
+      padding: 55px 7%;
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 43px);
+      margin-bottom: 13px;
+    }
+
+    .hero p {
+      max-width: 550px;
+      color: #e1edff;
+      line-height: 1.7;
+    }
+
+    .search-area {
+      display: flex;
+      gap: 10px;
+      padding: 25px 7%;
+      flex-wrap: wrap;
+    }
+
+    input, select {
+      border: 1px solid #d4e2f5;
+      border-radius: 9px;
+      padding: 13px 15px;
+      font-size: 15px;
+      background: white;
+      color: var(--text);
+    }
+
+    input {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    button {
+      border: none;
+      border-radius: 9px;
+      padding: 13px 18px;
+      background: var(--blue);
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #0f53ad;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    main {
+      padding: 5px 7% 45px;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .section-heading h2 {
+      font-size: 23px;
+    }
+
+    .section-heading span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .movie-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px #173b6710;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 22px #173b6720;
+    }
+
+    .poster {
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      display: block;
+      background: #dceaff;
+    }
+
+    .movie-info {
+      padding: 12px;
+    }
+
+    .movie-info h3 {
+      font-size: 15px;
+      line-height: 1.4;
+      margin-bottom: 7px;
+    }
+
+    .movie-info p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .rating {
+      color: #d18b00 !important;
+      font-weight: bold;
+    }
+
+    .status {
+      text-align: center;
+      padding: 35px 10px;
+      color: var(--muted);
+      grid-column: 1 / -1;
+      line-height: 1.7;
+    }
+
+    .load-more {
+      display: block;
+      margin: 28px auto 0;
+    }
+
+    footer {
+      background: var(--blue-dark);
+      color: #dceaff;
+      padding: 25px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #07152ddd;
+      z-index: 5;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 15px;
+      padding: 22px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-top {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .modal-poster {
+      width: 145px;
+      border-radius: 9px;
+    }
+
+    .modal-info {
+      flex: 1;
+    }
+
+    .modal-info h2 {
+      margin-bottom: 12px;
+    }
+
+    .modal-info p {
+      margin-bottom: 10px;
+      color: #5b6b82;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .description {
+      margin: 18px 0;
+      line-height: 1.7;
+      color: #53647b;
+    }
+
+    .close-btn {
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .movie-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 550px) {
+      header {
+        padding: 16px 5%;
+      }
+
+      nav {
+        gap: 12px;
+      }
+
+      .hero {
+        padding: 40px 5%;
+      }
+
+      .search-area, main {
+        padding-left: 5%;
+        padding-right: 5%;
+      }
+
+      .movie-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+      }
+
+      .movie-info {
+        padding: 10px;
+      }
+
+      .modal-top {
+        gap: 13px;
+      }
+
+      .modal-poster {
+        width: 110px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">Blue<span>Cinema</span></div>
+    <nav>
+      <a href="#">Beranda</a>
+      <a href="#movies">Film</a>
+      <a href="#footer">Tentang</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Temukan Film Favoritmu 🎬</h1>
+    <p>
+      Jelajahi berbagai film populer dan film terbaru dalam satu tempat.
+      Cari judul favoritmu dan lihat informasi lengkapnya.
+    </p>
+  </section>
+
+  <section class="search-area">
+    <input
+      id="searchInput"
+      type="search"
+      placeholder="Cari judul film..."
+      aria-label="Cari judul film"
+    >
+    <button id="searchButton">Cari Film</button>
+
+    <select id="category">
+      <option value="popular">Populer</option>
+      <option value="now_playing">Sedang Tayang</option>
+      <option value="top_rated">Rating Tertinggi</option>
+      <option value="upcoming">Segera Tayang</option>
+    </select>
+  </section>
+
+  <main id="movies">
+    <div class="section-heading">
+      <h2 id="sectionTitle">Film Populer</h2>
+      <span id="movieCount"></span>
+    </div>
+
+    <div class="movie-grid" id="movieGrid">
+      <div class="status">Sedang memuat film...</div>
+    </div>
+
+    <button class="load-more" id="loadMore">
+      Muat Lebih Banyak
+    </button>
+  </main>
+
+  <div class="modal" id="movieModal">
+    <div class="modal-content">
+      <div id="modalBody"></div>
+      <button class="close-btn" id="closeButton">Tutup</button>
+    </div>
+  </div>
+
+  <footer id="footer">
+    <strong>BlueCinema</strong><br>
+    Website katalog film dengan tampilan biru dan putih.<br>
+    Informasi film disediakan melalui TMDB API.
+  </footer>
+
+  <script>
+    // API KEY TMDB
+    const API_KEY = "6ae50f6993c99cda2a933b38b24ba623";
+
+    const API_BASE = "https://api.themoviedb.org/3";
+    const IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
+
+    let currentPage = 1;
+    let currentQuery = "";
+    let currentCategory = "popular";
+    let totalPages = 1;
+    let requestNumber = 0;
+
+    const grid = document.getElementById("movieGrid");
+    const loadMoreButton = document.getElementById("loadMore");
+    const modal = document.getElementById("movieModal");
+    const modalBody = document.getElementById("modalBody");
+
+    function setStatus(message) {
+      grid.innerHTML = "";
+
+      const status = document.createElement("div");
+      status.className = "status";
+      status.textContent = message;
+
+      grid.appendChild(status);
+    }
+
+    async function requestAPI(endpoint, params = {}) {
+      const url = new URL(API_BASE + endpoint);
+
+      url.searchParams.set("api_key", API_KEY);
+      url.searchParams.set("language", "id-ID");
+
+      Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.set(key, value);
+      });
+
+      let response;
+
+      try {
+        response = await fetch(url);
+      } catch (error) {
+        throw new Error(
+          "Koneksi gagal. Periksa internet dan coba lagi."
+        );
+      }
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "API key tidak valid atau belum aktif. Periksa API key TMDB."
+          );
+        }
+
+        if (response.status === 429) {
+          throw new Error(
+            "Permintaan terlalu banyak. Tunggu sebentar lalu coba lagi."
+          );
+        }
+
+        throw new Error(
+          "Gagal mengambil data film. Coba lagi nanti."
+        );
+      }
+
+      return response.json();
+    }
+
+    async function loadMovies(reset = true) {
+      const thisRequest = ++requestNumber;
+
+      if (reset) {
+        currentPage = 1;
+        setStatus("Sedang memuat film...");
+      } else {
+        loadMoreButton.disabled = true;
+        loadMoreButton.textContent = "Memuat...";
+      }
+
+      try {
+        let endpoint;
+        const params = { page: currentPage };
+
+        if (currentQuery) {
+          endpoint = "/search/movie";
+          params.query = currentQuery;
+        } else {
+          endpoint = "/movie/" + currentCategory;
+        }
+
+        const data = await requestAPI(endpoint, params);
+
+        if (thisRequest !== requestNumber) return;
+
+        totalPages = Math.min(data.total_pages || 1, 500);
+
+        document.getElementById("movieCount").textContent =
+          (data.total_results || 0).toLocaleString("id-ID") + " film";
+
+        if (reset) {
+          grid.innerHTML = "";
+        }
+
+        if (!data.results || data.results.length === 0) {
+          setStatus("Film tidak ditemukan. Coba judul lain.");
+          loadMoreButton.style.display = "none";
+          return;
+        }
+
+        data.results.forEach(movie => {
+          grid.appendChild(createMovieCard(movie));
+        });
+
+        loadMoreButton.style.display =
+          currentPage < totalPages ? "block" : "none";
+
+      } catch (error) {
+        if (thisRequest !== requestNumber) return;
+
+        setStatus(error.message);
+        loadMoreButton.style.display = "none";
+
+      } finally {
+        if (thisRequest === requestNumber) {
+          loadMoreButton.disabled = false;
+          loadMoreButton.textContent = "Muat Lebih Banyak";
+        }
+      }
+    }
+
+    function createMovieCard(movie) {
+      const card = document.createElement("article");
+      card.className = "movie-card";
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", "Detail " + movie.title);
+
+      const image = document.createElement("img");
+      image.className = "poster";
+      image.alt = movie.title || "Poster film";
+      image.loading = "lazy";
+
+      image.src = movie.poster_path
+        ? IMAGE_BASE + movie.poster_path
+        : "https://placehold.co/400x600/eaf3ff/1769d2?text=No+Poster";
+
+      const info = document.createElement("div");
+      info.className = "movie-info";
+
+      const title = document.createElement("h3");
+      title.textContent = movie.title || "Tanpa judul";
+
+      const year = document.createElement("p");
+      year.textContent = movie.release_date
+        ? movie.release_date.slice(0, 4)
+        : "Tahun tidak tersedia";
+
+      const rating = document.createElement("p");
+      rating.className = "rating";
+      rating.textContent = "★ " +
+        (movie.vote_average
+          ? movie.vote_average.toFixed(1)
+          : "Belum ada");
+
+      info.append(title, year, rating);
+      card.append(image, info);
+
+      card.addEventListener("click", () => {
+        showDetails(movie.id);
+      });
+
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          showDetails(movie.id);
+        }
+      });
+
+      return card;
+    }
+
+    async function showDetails(movieId) {
+      modal.style.display = "flex";
+      modalBody.textContent = "Memuat detail film...";
+
+      try {
+        const movie = await requestAPI("/movie/" + movieId);
+
+        modalBody.innerHTML = "";
+
+        const top = document.createElement("div");
+        top.className = "modal-top";
+
+        const image = document.createElement("img");
+        image.className = "modal-poster";
+        image.alt = movie.title || "Poster film";
+
+        image.src = movie.poster_path
+          ? IMAGE_BASE + movie.poster_path
+          : "https://placehold.co/400x600/eaf3ff/1769d2?text=No+Poster";
+
+        const info = document.createElement("div");
+        info.className = "modal-info";
+
+        const title = document.createElement("h2");
+        title.textContent = movie.title || "Tanpa judul";
+
+        const year = document.createElement("p");
+        year.textContent = "Tahun: " +
+          (movie.release_date
+            ? movie.release_date.slice(0, 4)
+            : "-");
+
+        const rating = document.createElement("p");
+        rating.textContent = "Rating: ★ " +
+          (movie.vote_average
+            ? movie.vote_average.toFixed(1)
+            : "-");
+
+        const genres = document.createElement("p");
+        genres.textContent = "Genre: " +
+          ((movie.genres || [])
+            .map(genre => genre.name)
+            .join(", ") || "-");
+
+        const duration = document.createElement("p");
+        duration.textContent = "Durasi: " +
+          (movie.runtime ? movie.runtime + " menit" : "-");
+
+        info.append(title, year, rating, genres, duration);
+        top.append(image, info);
+
+        const description = document.createElement("p");
+        description.className = "description";
+        description.textContent =
+          movie.overview || "Sinopsis belum tersedia.";
+
+        modalBody.append(top, description);
+
+      } catch (error) {
+        modalBody.textContent = error.message;
+      }
+    }
+
+    function searchMovies() {
+      currentQuery = document
+        .getElementById("searchInput")
+        .value.trim();
+
+      document.getElementById("sectionTitle").textContent =
+        currentQuery
+          ? 'Hasil: "' + currentQuery + '"'
+          : "Film Populer";
+
+      loadMovies(true);
+    }
+
+    function changeCategory() {
+      currentQuery = "";
+      document.getElementById("searchInput").value = "";
+
+      currentCategory = document.getElementById("category").value;
+
+      const titles = {
+        popular: "Film Populer",
+        now_playing: "Sedang Tayang",
+        top_rated: "Rating Tertinggi",
+        upcoming: "Segera Tayang"
+      };
+
+      document.getElementById("sectionTitle").textContent =
+        titles[currentCategory] || "Daftar Film";
+
+      loadMovies(true);
+    }
+
+    function loadMoreMovies() {
+      if (currentPage >= totalPages) return;
+
+      currentPage++;
+      loadMovies(false);
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+    }
+
+    document.getElementById("searchButton")
+      .addEventListener("click", searchMovies);
+
+    document.getElementById("searchInput")
+      .addEventListener("keydown", event => {
+        if (event.key === "Enter") searchMovies();
+      });
+
+    document.getElementById("category")
+      .addEventListener("change", changeCategory);
+
+    loadMoreButton.addEventListener("click", loadMoreMovies);
+
+    document.getElementById("closeButton")
+      .addEventListener("click", closeModal);
+
+    modal.addEventListener("click", event => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeModal();
+    });
+
+    // Menampilkan film saat halaman dibuka
+    loadMovies();
+  </script>
+</body>
+</html>
